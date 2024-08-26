@@ -1,6 +1,8 @@
-package cn.zhangxiang.mychat.interceptor;
+package cn.zhangxiang.mychat.config.interceptor;
 
+import cn.zhangxiang.mychat.config.auth.NoLogin;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -8,6 +10,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.lang.reflect.Method;
 
 /**
  * preHandle：在请求到达处理器之前执行，true就继续操作，false则中断请求处理
@@ -20,9 +23,19 @@ import javax.servlet.http.HttpSession;
 public class MyInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("preHandle：{}",request.getRequestURI());
+        // 不是映射到方法直接通过
+        if(!(handler instanceof HandlerMethod)){
+            return true;
+        }
+        // 免登录注解
+        Method method = ((HandlerMethod) handler).getMethod();
+        if(method.isAnnotationPresent(NoLogin.class)){
+            NoLogin annotation = method.getAnnotation(NoLogin.class);
+            if(annotation.required()){
+                return true;
+            }
+        }
         String token = request.getHeader("token");
-        log.info("查看token：{}",token);
         if(token == null){
             log.info("没有token");
 //            response.sendRedirect("/user/login"); //重定向登录页
@@ -41,6 +54,7 @@ public class MyInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         log.info("afterCompletion");
+
     }
 }
 
