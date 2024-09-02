@@ -1,6 +1,9 @@
 package cn.zhangxiang.mychat.config.interceptor;
 
 import cn.zhangxiang.mychat.config.auth.NoLogin;
+import cn.zhangxiang.mychat.config.exception.MyException;
+import cn.zhangxiang.mychat.utils.Assert;
+import cn.zhangxiang.mychat.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -35,11 +38,15 @@ public class MyInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-        String token = request.getHeader("token");
-        if(token == null){
-            log.info("没有token");
-//            response.sendRedirect("/user/login"); //重定向登录页
-            return false;
+        String token = request.getHeader("Authorization");
+        if(Assert.notNull(token)){
+            String userId = JwtUtils.getAudience(token);
+            Boolean isOk = JwtUtils.verifyToken(token, userId);
+            if(!isOk){
+                throw new MyException(4003,"token过期");
+            }
+        }else {
+            throw new MyException(4002,"无Authorization");
         }
         return true;
     }

@@ -5,28 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
-
 /**
  * @author zhangxiang
- * @date 2024-08-23 11:16
+ * @date 2024-08-30 10:41
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class UserRegisterDTO {
-
-    private Long userId;
-
-    private String nickName;
+public class UserLoginDTO {
 
     private String account;
 
     private String password;
-
-    private String phone;
-
-    private Date createTime;
 }
 

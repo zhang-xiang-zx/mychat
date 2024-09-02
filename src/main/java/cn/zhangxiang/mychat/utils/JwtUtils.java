@@ -45,7 +45,7 @@ public class JwtUtils {
             isOk = true;
         } catch (Exception e) {
 //            e.printStackTrace();
-            log.info("token校验错误");
+            log.info("token过期");
         }
         return isOk;
     }

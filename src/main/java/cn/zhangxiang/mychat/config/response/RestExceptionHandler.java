@@ -1,5 +1,6 @@
 package cn.zhangxiang.mychat.config.response;
 
+import cn.zhangxiang.mychat.config.exception.MyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,8 +21,13 @@ public class RestExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<String> exception(Exception e){
-
         return Result.fail(500,e.getMessage());
+    }
+
+    @ExceptionHandler(MyException.class)
+    @ResponseStatus(HttpStatus.OK)  // 你可以根据需求设置不同的Http状态码
+    public Result<String> handleAccountValidationException(MyException e) {
+        return Result.fail(e.getCode(), e.getMessage());
     }
 }
 

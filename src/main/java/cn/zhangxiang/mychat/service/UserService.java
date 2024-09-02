@@ -1,6 +1,8 @@
 package cn.zhangxiang.mychat.service;
 
+import cn.zhangxiang.mychat.pojo.dto.UserLoginDTO;
 import cn.zhangxiang.mychat.pojo.dto.UserRegisterDTO;
+import cn.zhangxiang.mychat.pojo.entity.User;
 
 /**
  * @author zhangxiang
@@ -14,4 +16,13 @@ public interface UserService {
      * @date 2024/8/23 11:35
      */
     String register(UserRegisterDTO dto);
+
+    /**
+     * 用户登录
+     * @author zhangxiang
+     * @date 2024/8/30 10:45
+     */
+    String login(UserLoginDTO dto);
+
+    User selectUserById(String userId);
 }

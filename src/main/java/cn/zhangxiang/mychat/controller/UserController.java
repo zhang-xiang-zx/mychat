@@ -1,6 +1,7 @@
 package cn.zhangxiang.mychat.controller;
 
 import cn.zhangxiang.mychat.config.auth.NoLogin;
+import cn.zhangxiang.mychat.pojo.dto.UserLoginDTO;
 import cn.zhangxiang.mychat.pojo.dto.UserRegisterDTO;
 import cn.zhangxiang.mychat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,12 @@ public class UserController {
     @PostMapping("register")
     public String register(@RequestBody UserRegisterDTO dto){
         return userService.register(dto);
+    }
+
+    @NoLogin
+    @PostMapping("login")
+    public String login(@RequestBody UserLoginDTO dto){
+        return userService.login(dto);
     }
 
 }
