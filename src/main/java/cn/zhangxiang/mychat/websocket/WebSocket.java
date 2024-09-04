@@ -3,7 +3,9 @@ package cn.zhangxiang.mychat.websocket;
 import cn.zhangxiang.mychat.config.exception.MyException;
 import cn.zhangxiang.mychat.pojo.dto.LoginRoomDTO;
 import cn.zhangxiang.mychat.pojo.entity.User;
+import cn.zhangxiang.mychat.service.OnlineUserRoomService;
 import cn.zhangxiang.mychat.service.UserService;
+import cn.zhangxiang.mychat.utils.Assert;
 import cn.zhangxiang.mychat.utils.JwtUtils;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -26,13 +29,11 @@ import java.util.stream.Collectors;
 @ServerEndpoint(value = "/websocket/{userInfo}")
 @Component
 public class WebSocket {
-//    private static ConcurrentHashMap<String, WebSocket> webSocketMap = new ConcurrentHashMap<>();
     private static ConcurrentHashMap<String, Session> webSocketMap = new ConcurrentHashMap<>();
-    private Session session;
-    private String userName;
-
 
     private static UserService userService;
+
+    private static OnlineUserRoomService onlineUserRoomService;
 
     // 这样就能解决只注册一次问题
     @Autowired
@@ -40,10 +41,13 @@ public class WebSocket {
         WebSocket.userService = userService;
     }
 
+    @Autowired
+    public void setOnlineUserRoomService(OnlineUserRoomService onlineUserRoomService){
+        WebSocket.onlineUserRoomService = onlineUserRoomService;
+    }
+
     @OnOpen
     public void onOpen(Session session, @PathParam("userInfo") String userInfo) {
-        log.info("查看session：{}",session);
-
         userInfo = "{" + userInfo + "}";
         LoginRoomDTO loginRoomInfo = JSON.parseObject(userInfo, LoginRoomDTO.class);
         String authorization = loginRoomInfo.getAuthorization();
@@ -53,9 +57,7 @@ public class WebSocket {
         Boolean isOK = JwtUtils.verifyToken(authorization, userId);
 
         webSocketMap.put(userId, session);
-        if (isOK) {
-
-        } else {
+        if (!isOK) {
             log.info("验证错误");
             sendMessage("5001","token验证错误",userId);
             webSocketMap.remove(userId);
@@ -63,9 +65,14 @@ public class WebSocket {
 
     }
 
+    //    public void onClose(@PathParam("userId") Long userId)
     @OnClose
-    public void onClose(@PathParam("userId") Long userId) {
-        log.info("查看传来的：{}", userId);
+    public void onClose(Session session) {
+        String userId = webSocketMap.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(session))
+                .findFirst().get().getKey();
+        User user = userService.selectUserById(userId);
+        log.info("{}断开连接了",user.getNickName());
         webSocketMap.remove(userId);
         log.info("【websocket消息】连接断开,总数:{}", webSocketMap.size());
     }
@@ -78,6 +85,19 @@ public class WebSocket {
 
         User user = userService.selectUserById(userId);
         log.info("【websocket消息】收到" + user.getNickName() + "发来的消息:" + message);
+        List<Long> userIdList = onlineUserRoomService.selectRoomUserByUserId(Long.valueOf(userId));
+        if(Assert.notEmpty(userIdList)){
+            log.info("在用一聊天室的用户有：{}",userIdList);
+            for(Long uid : userIdList){
+                String onUserId = webSocketMap.entrySet().stream()
+                        .filter(entry -> entry.getKey().equals(String.valueOf(uid)))
+                        .findFirst().get().getKey();
+                sendMessage("200",message,onUserId);
+            }
+        }else {
+            log.info("无用户在用一聊天室");
+        }
+
     }
 
 //    @OnError

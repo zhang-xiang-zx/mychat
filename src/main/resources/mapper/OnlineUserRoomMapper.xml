@@ -5,9 +5,16 @@
 <mapper namespace="cn.zhangxiang.mychat.mapper.OnlineUserRoomMapper">
     <select id="selectByUserId" resultType="cn.zhangxiang.mychat.pojo.entity.OnlineUserRoom">
         select online_id, user_id, room_id
-        from (select online_id, user_id, room_id
-              from online_user_room
-              where user_id = #{userId}) b
-        where room_id = b.room_id and user_id != b.user_id
+        from  online_user_room
+        where room_id =(select room_id
+                        from online_user_room
+                        where user_id = #{userId})
+          and user_id != #{userId}
     </select>
+    <insert id="insertUserOnlineRoom">
+        insert into online_user_room(user_id, room_id) value (#{userId}, #{roomId})
+    </insert>
+    <delete id="delUserOnlineRoom">
+        delete from online_user_room where user_id = #{userId}
+    </delete>
 </mapper>

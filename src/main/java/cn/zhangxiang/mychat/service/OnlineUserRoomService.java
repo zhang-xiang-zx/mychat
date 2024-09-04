@@ -14,4 +14,11 @@ public interface OnlineUserRoomService {
      * @date 2024/9/2 17:54
      */
     List<Long> selectRoomUserByUserId(Long userId);
+
+    /**
+     * 用户加入在线房间
+     * @author zhangxiang
+     * @date 2024/9/3 9:35
+     */
+    void joinOnlineRoom(String userId, Long roomId);
 }

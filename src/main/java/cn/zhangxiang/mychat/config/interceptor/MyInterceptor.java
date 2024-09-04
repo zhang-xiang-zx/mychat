@@ -45,6 +45,7 @@ public class MyInterceptor implements HandlerInterceptor {
             if(!isOk){
                 throw new MyException(4003,"token过期");
             }
+            request.setAttribute("userId",userId);
         }else {
             throw new MyException(4002,"无Authorization");
         }

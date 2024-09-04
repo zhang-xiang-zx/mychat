@@ -18,4 +18,18 @@ public interface OnlineUserRoomMapper {
      * @date 2024/9/2 16:53
      */
     List<OnlineUserRoom> selectByUserId(Long userId);
+
+    /**
+     * 用户加入在线房间
+     * @author zhangxiang
+     * @date 2024/9/3 9:38
+     */
+    void insertUserOnlineRoom(Long userId, Long roomId);
+
+    /**
+     * 删除用户所在的在线聊天室
+     * @author zhangxiang
+     * @date 2024/9/4 11:30
+     */
+    void delUserOnlineRoom(Long userId);
 }

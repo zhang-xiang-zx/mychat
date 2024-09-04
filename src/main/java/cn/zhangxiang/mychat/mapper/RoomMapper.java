@@ -1,27 +1,28 @@
-package cn.zhangxiang.mychat.service;
+package cn.zhangxiang.mychat.mapper;
 
-import cn.zhangxiang.mychat.pojo.dto.CreateRoomDTO;
 import cn.zhangxiang.mychat.pojo.entity.Room;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 /**
  * @author zhangxiang
- * @date 2024-08-30 17:27
+ * @date 2024-09-03 15:47
  */
-public interface ChatRoomService {
+@Mapper
+public interface RoomMapper {
 
     /**
      * 查找所有房间
      * @author zhangxiang
-     * @date 2024/9/3 15:46
+     * @date 2024/9/3 15:54
      */
     List<Room> selectAllRoom();
 
     /**
      * 创建房间
      * @author zhangxiang
-     * @date 2024/9/3 16:03
+     * @date 2024/9/3 16:13
      */
-    void createRoom(CreateRoomDTO dto, String userId);
+    void createRoom(Room info);
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zhangxiang.mychat.mapper.RoomMapper">
+    <select id="selectAllRoom" resultType="cn.zhangxiang.mychat.pojo.entity.Room">
+        select room_id, room_name, max_num, create_time from room
+    </select>
+
+    <insert id="createRoom" parameterType="cn.zhangxiang.mychat.pojo.entity.Room">
+        insert into room (room_name, max_num, create_time, create_user_id)
+            value(#{roomName},#{maxNum},#{createTime},#{createUserId})
+    </insert>
+</mapper>
